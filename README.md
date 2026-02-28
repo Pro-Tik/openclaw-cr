@@ -1,1 +1,11 @@
-# openclaw-cr
+OpenClaw CR: BLC Portal Skill 🎓A custom skill for OpenClaw AI agents that securely authenticates with the Daffodil International University (DIU) BLC portal (Moodle) to fetch current semester courses and upcoming assignment deadlines.Designed specifically for Class Representatives (CRs) and students to automate deadline tracking and feed real-time university data directly into their personal AI assistants.✨ FeaturesAutomated Authentication: Securely manages Moodle session tokens (sesskey) behind the scenes.Course Filtering: Automatically filters out past semesters to only display current, active courses (e.g., Spring 2026).Smart Timeline: Bypasses restricted calendar endpoints to fetch all upcoming assignments and deadlines for the current month.AI-Ready Format: Pre-formats the scraped data into token-efficient strings and structured JSON, preventing LLM hallucinations.🚀 Installation1. Clone the repositorygit clone [https://github.com/Pro-Tik/openclaw-cr.git](https://github.com/Pro-Tik/openclaw-cr.git)
+cd openclaw-cr
+2. Set up your virtual environmentpython3 -m venv venv
+source venv/bin/activate  # On Windows use: venv\Scripts\activate
+3. Install dependenciespip install requests beautifulsoup4 python-dotenv
+⚙️ ConfigurationSecurity is a priority. Never hardcode your university password. Create a .env file in the root of the project to store your credentials:touch .env
+Add the following variables to your .env file:BLC_BASE_URL="[https://elearn.daffodilvarsity.edu.bd](https://elearn.daffodilvarsity.edu.bd)"
+BLC_USERNAME="your_student_id_or_username"
+BLC_PASSWORD="your_secure_password"
+(Note: Ensure .env is listed in your .gitignore to prevent leaking your credentials to GitHub.)💻 UsageStandalone (Terminal)You can run the scraper directly from your terminal to generate a local blc_data.json dashboard file:python scripts/blc_scraper.py
+As an OpenClaw SkillTo integrate this with your OpenClaw agent, ensure the skill is registered in your agent's skill directory. Once running, you can ask your agent natural language queries like:"Agent, what assignments do I have due for Data Structures this month?""Can you check my BLC portal and list my current courses?"The agent will trigger check_university_deadlines(), scrape the portal in real-time, and format the response for you.🛠️ Built WithPython 3Requests - HTTP sessions and AJAX callsBeautifulSoup4 - HTML parsing and token extraction
