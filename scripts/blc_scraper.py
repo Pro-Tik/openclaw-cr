@@ -14,7 +14,7 @@ load_dotenv()
 BASE_URL = os.getenv("BLC_BASE_URL", "https://elearn.daffodilvarsity.edu.bd")
 USERNAME = os.getenv("BLC_USERNAME")
 PASSWORD = os.getenv("BLC_PASSWORD")
-DATA_FILE = "/home/procloud/.openclaw/workspace/skills/public/cr/data/assignments.json"
+DATA_FILE = "./.openclaw/workspace/skills/public/cr/data/assignments.json"
 
 class BLCScraper:
     def __init__(self):
