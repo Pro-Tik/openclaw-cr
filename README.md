@@ -1,32 +1,57 @@
-# OpenClaw CR: BLC Portal Skill
+# OpenClaw Skill: BLC Portal (DIU Moodle)
 
-A custom skill for OpenClaw AI agents that securely authenticates with the **Daffodil International University (DIU) BLC portal (Moodle)** to fetch current semester courses and upcoming assignment deadlines.
+This repository provides an installable **OpenClaw Skill** that enables an OpenClaw agent to securely authenticate with the Daffodil International University (DIU) BLC portal (Moodle) and fetch:
 
-Designed specifically for **Class Representatives (CRs)** and students to automate deadline tracking and feed real-time university data directly into their personal AI assistants.
+* Current active semester courses
+* Upcoming assignment deadlines (current month)
+* Structured, AI-ready academic data
 
----
-
-## Features
-
-### Automated Authentication
-
-Securely manages Moodle session tokens (`sesskey`) behind the scenes.
-
-### Course Filtering
-
-Automatically filters out past semesters to only display current, active courses (e.g., *Spring 2026*).
-
-### Smart Timeline
-
-Bypasses restricted calendar endpoints to fetch all upcoming assignments and deadlines for the current month.
-
-### AI-Ready Format
-
-Pre-formats the scraped data into token-efficient strings and structured JSON, preventing LLM hallucinations.
+The skill is designed so an OpenClaw agent can be instructed to fetch and install it directly from this repository.
 
 ---
 
-## Installation
+## Repository
+
+```
+https://github.com/Pro-Tik/openclaw-cr
+```
+
+An OpenClaw agent can be instructed with:
+
+> "Go to this repository and install the BLC Portal skill: [https://github.com/Pro-Tik/openclaw-cr](https://github.com/Pro-Tik/openclaw-cr)"
+
+---
+
+## What This Skill Does
+
+### Secure Authentication
+
+* Logs into DIU BLC (Moodle)
+* Manages session cookies and `sesskey` automatically
+* Avoids exposing credentials in source code
+
+### Active Course Detection
+
+* Filters out past semesters
+* Returns only currently active courses (e.g., Spring 2026)
+
+### Assignment & Deadline Extraction
+
+* Fetches upcoming assignments for the current month
+* Bypasses restricted calendar endpoints when necessary
+* Produces structured JSON output
+
+### LLM-Optimized Output
+
+* Token-efficient formatting
+* Clean structured data
+* Reduces hallucination risk by grounding responses in live portal data
+
+---
+
+## Installation (Manual Setup)
+
+If installing manually instead of through an OpenClaw agent:
 
 ### 1. Clone the repository
 
@@ -35,11 +60,11 @@ git clone https://github.com/Pro-Tik/openclaw-cr.git
 cd openclaw-cr
 ```
 
-### 2. Set up your virtual environment
+### 2. Create virtual environment
 
 ```bash
 python3 -m venv venv
-source venv/bin/activate  # On Windows use: venv\Scripts\activate
+source venv/bin/activate  # Windows: venv\Scripts\activate
 ```
 
 ### 3. Install dependencies
@@ -52,15 +77,15 @@ pip install requests beautifulsoup4 python-dotenv
 
 ## Configuration
 
-Security is a priority. **Never hardcode your university password.**
+Security is mandatory. Never hardcode credentials.
 
-Create a `.env` file in the root of the project to store your credentials:
+Create a `.env` file in the project root:
 
 ```bash
 touch .env
 ```
 
-Add the following variables to your `.env` file:
+Add:
 
 ```env
 BLC_BASE_URL="https://elearn.daffodilvarsity.edu.bd"
@@ -68,41 +93,62 @@ BLC_USERNAME="your_student_id_or_username"
 BLC_PASSWORD="your_secure_password"
 ```
 
-> ⚠️ Ensure `.env` is listed in your `.gitignore` to prevent leaking your credentials to GitHub.
+Ensure `.env` is listed in `.gitignore`.
 
 ---
 
-## Usage
+## Using as an OpenClaw Skill
 
-### Standalone (Terminal)
+1. Place this repository inside your OpenClaw agent's skills directory
+   OR
+2. Instruct your OpenClaw agent to fetch and register this repository as a skill
 
-Run the scraper directly from your terminal to generate a local `blc_data.json` dashboard file:
+Once registered, the agent can trigger the internal function:
+
+```
+check_university_deadlines()
+```
+
+Example natural language prompts:
+
+* "Check my BLC portal and list my current courses."
+* "What assignments are due this month?"
+* "Do I have anything due for Data Structures this week?"
+
+The agent will:
+
+1. Authenticate with BLC
+2. Scrape live academic data
+3. Format structured output
+4. Return grounded results
+
+---
+
+## Standalone Usage (Optional)
+
+To generate a local dashboard file:
 
 ```bash
 python scripts/blc_scraper.py
 ```
 
----
+This will create:
 
-### As an OpenClaw Skill
-
-To integrate this with your OpenClaw agent:
-
-1. Ensure the skill is registered in your agent's skill directory.
-2. Start your OpenClaw agent.
-
-You can then ask natural language queries like:
-
-* "Agent, what assignments do I have due for Data Structures this month?"
-* "Can you check my BLC portal and list my current courses?"
-
-The agent will trigger `check_university_deadlines()`, scrape the portal in real-time, and format the response for you.
+```
+blc_data.json
+```
 
 ---
 
 ## Built With
 
-* **Python 3**
-* **Requests** — HTTP sessions and AJAX calls
-* **BeautifulSoup4** — HTML parsing and token extraction
-* **python-dotenv** — Secure environment variable management
+* Python 3
+* requests
+* beautifulsoup4
+* python-dotenv
+
+---
+
+## Purpose
+
+This skill allows OpenClaw agents to act as real-time academic assistants for DIU students and Class Representatives by directly integrating university portal data into agent workflows.
