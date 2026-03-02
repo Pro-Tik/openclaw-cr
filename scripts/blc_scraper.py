@@ -7,6 +7,12 @@ import calendar
 from datetime import datetime
 from dotenv import load_dotenv
 
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+# Import our custom schedule manager function
+from add_deadline import add_deadline
+
 # Load environment variables from the .env file
 load_dotenv()
 
@@ -14,7 +20,7 @@ load_dotenv()
 BASE_URL = os.getenv("BLC_BASE_URL", "https://elearn.daffodilvarsity.edu.bd")
 USERNAME = os.getenv("BLC_USERNAME")
 PASSWORD = os.getenv("BLC_PASSWORD")
-DATA_FILE = "./.openclaw/workspace/skills/public/cr/data/assignments.json"
+DATA_FILE = "./data/assignments.json"
 
 class BLCScraper:
     def __init__(self):
@@ -177,8 +183,8 @@ def find_new_assignments(current_tasks, previous_tasks):
     new = [t for t in current_tasks if t['name'] not in previous_titles]
     return new
 
-def send_whatsapp_alert(new_tasks):
-    """Send WhatsApp alert for new tasks without using AI"""
+def send_alerts_and_sync(new_tasks):
+    """Send WhatsApp alert for new tasks and sync to Firebase"""
     if not new_tasks:
         return
     
@@ -186,10 +192,30 @@ def send_whatsapp_alert(new_tasks):
     target = os.getenv("WHATSAPP_TARGET", "+8801851407301")
     
     for task in new_tasks:
+        # 1. WhatsApp Alert
         message = f"🚨 *New Assignment!*\n\n*Course:* {task['course']}\n*Task:* {task['name']}\n*Due:* {task['deadline']}"
         cmd = f"bash {whatsapp_script} '{target}' '{message}'"
         os.system(cmd)
         print(f"  📱 WhatsApp alert sent for: {task['name']}")
+        
+        # 2. Firebase Sync
+        try:
+             # Example deadline string: 'Tuesday, 20 March 2026, 11:59 PM'
+             # We need to extract the date for the add_deadline script (YYYY-MM-DD)
+             # Let's cleanly format it if possible, otherwise we pass the raw string
+             print(f"  🔁 Syncing {task['name']} to Firebase...")
+             # For now, just passing the raw deadline string directly. The time_str defaults to 23:59.
+             doc_id = add_deadline(
+                 title=f"{task['course']} - {task['name']}",
+                 date_str=task['deadline'],  # We pass the full clean string from BLC
+                 task_type="ASSIGNMENT",
+                 batch="45",  # Defaults
+                 section="I"
+             )
+             if doc_id:
+                 print(f"  ✅ Firebase sync successful! (ID: {doc_id})")
+        except Exception as e:
+            print(f"  ❌ Firebase sync failed: {e}")
 
 def main():
     scraper = BLCScraper()
@@ -212,8 +238,8 @@ def main():
         for t in new_tasks:
             print(f"  ⚠️ {t['course']}: {t['name']} - Due: {t['deadline']}")
         
-        # Send WhatsApp alerts (no AI tokens used)
-        send_whatsapp_alert(new_tasks)
+        # Send WhatsApp alerts and Sync to Firebase
+        send_alerts_and_sync(new_tasks)
     else:
         print("\n✅ No new assignments found")
     

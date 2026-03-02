@@ -9,7 +9,7 @@ This skill monitors the BLC (Daffodil International University eLearn) for new a
 
 ## Setup
 
-1. Create `.env` file in `/home/procloud/.openclaw/workspace/skills/public/cr/.env`:
+1. Create `.env` file in `/home/p4b/.openclaw/workspace/skills/public/cr/.env`:
    ```
    BLC_USERNAME=your_username
    BLC_PASSWORD=your_password
@@ -19,14 +19,15 @@ This skill monitors the BLC (Daffodil International University eLearn) for new a
 
 2. Make the script executable:
    ```bash
-   chmod +x /home/procloud/.openclaw/workspace/skills/public/cr/scripts/blc_scraper.py
+   chmod +x /home/p4b/.openclaw/workspace/skills/public/cr/scripts/blc_scraper.py
+   chmod +x /home/p4b/.openclaw/workspace/skills/public/cr/manage.sh
    ```
 
 ## Running the Scraper
 
-To check for new assignments:
+To check for new assignments manually, or to add/delete deadlines and announcements:
 ```bash
-cd /home/procloud/.openclaw/workspace/skills/public/cr && python3 scripts/blc_scraper.py
+cd /home/p4b/.openclaw/workspace/skills/public/cr && ./manage.sh
 ```
 
 The script will:
@@ -41,17 +42,18 @@ The script will:
 To set up automatic checking (e.g., every hour), add a cron job:
 ```bash
 crontab -e
-# Add: 0 * * * * cd /home/procloud/.openclaw/workspace/skills/public/cr && python3 scripts/blc_scraper.py >> /tmp/blc_scraper.log 2>&1
+# Add: 0 * * * * cd /home/p4b/.openclaw/workspace/skills/public/cr && python3 scripts/blc_scraper.py >> /tmp/blc_scraper.log 2>&1
 ```
 
 ## WhatsApp Alert Integration
 
 When new assignments are found, send alerts using the WhatsApp sender script:
 ```bash
-bash /home/procloud/.openclaw/workspace/skills/public/whatsapp-sender/scripts/send_message.sh 'TARGET_NUMBER' 'Assignment: TITLE | Course: COURSE | Due: DEADLINE'
+bash /home/p4b/.openclaw/workspace/skills/public/whatsapp-sender/scripts/send_message.sh 'TARGET_NUMBER' 'Assignment: TITLE | Course: COURSE | Due: DEADLINE'
 ```
 
-## Data Storage
+## Data Storage & Firebase Sync
 
-- Assignments are stored in: `/home/procloud/.openclaw/workspace/skills/public/cr/data/assignments.json`
+- Assignments are stored in: `/home/p4b/.openclaw/workspace/skills/public/cr/data/assignments.json`
 - The script compares current assignments with stored ones to detect new items
+- **Auto-Sync:** Newly detected assignments are also automatically added to the DIU Campus Schedule Firebase app using `scripts/add_deadline.py`
